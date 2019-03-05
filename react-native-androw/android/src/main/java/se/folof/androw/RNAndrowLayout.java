@@ -70,7 +70,7 @@ public class RNAndrowLayout extends ReactViewGroup {
     protected void dispatchDraw(Canvas canvas) {
 
         if(this.getMeasuredWidth() > 0 && this.getMeasuredHeight() > 0 &&
-           this.mShadowRadius > 0){
+                this.mShadowRadius > 0){
 
             final Bitmap shadowBitmap = Bitmap.createBitmap(this.getMeasuredWidth(), this.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
             final Canvas sCanvas = new Canvas(shadowBitmap);
@@ -90,22 +90,26 @@ public class RNAndrowLayout extends ReactViewGroup {
             }
 
 
-            int orgX = 0;
-            int orgY = 0;
+            int orgX = this.mShadowRadius;
+            int orgY = this.mShadowRadius;
             if(shadowX < 0){
-                orgX = (shadowX*-1);
-                shadowX = 0;
+                orgX = (shadowX*-1)+this.mShadowRadius;
+                shadowX = this.mShadowRadius;
+            }else{
+                shadowX += this.mShadowRadius;
             }
             if(shadowY < 0){
-                orgY = (shadowY*-1);
-                shadowY = 0;
+                orgY = (shadowY*-1)+this.mShadowRadius;
+                shadowY = this.mShadowRadius;
+            }else{
+                shadowY += this.mShadowRadius;
             }
 
 
             this.mPaint.setColor(this.mShadowColor);
             this.mPaint.setAlpha(Math.round(255*this.mShadowOpacity));
             this.mPaint.setMaskFilter(new BlurMaskFilter(this.mShadowRadius, BlurMaskFilter.Blur.NORMAL));
-
+            
             canvas.drawBitmap(shadowBitmap.extractAlpha(), shadowX, shadowY, this.mPaint);
             canvas.drawBitmap(originalBitmap, orgX, orgY, this.mOrgPaint);
         }else{
@@ -124,14 +128,14 @@ public class RNAndrowLayout extends ReactViewGroup {
         }
 
         if(shadowX < 0){
-            left += -((shadowX*-1)+this.mShadowRadius);
+            left -= ((shadowX*-1)+this.mShadowRadius);
             right += this.mShadowRadius;
         }else{
             left -= this.mShadowRadius;
             right += shadowX+this.mShadowRadius;
         }
         if(shadowY < 0){
-            top += -((shadowY*-1)+this.mShadowRadius);
+            top -= ((shadowY*-1)+this.mShadowRadius);
             bottom += this.mShadowRadius;
         }else{
             top -= this.mShadowRadius;
