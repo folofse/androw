@@ -1,0 +1,22 @@
+{
+    "name": "react-native-androw",
+    "description": "Solve shadows in React Native for Android",
+    "version": "0.0.16",
+    "author": "Olof Larsson <olof@folof.se> (http://www.folof.se)",
+    "keywords": [
+      "react-native",
+      "shadow",
+      "android"
+    ],
+    "license": "MIT",
+    "main": "src/index.js",
+    "peerDependencies": {
+      "react-native": ">=0.41.2"
+    },
+    "scripts": {
+      "release:major": "npm version major && git push origin && git push origin --follow-tags",
+      "release:minor": "npm version minor && git push origin && git push origin --follow-tags",
+      "release:patch": "npm version patch && git push origin && git push origin --follow-tags",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    }
+  }

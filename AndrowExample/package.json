@@ -1,0 +1,26 @@
+{
+  "name": "AndrowExample",
+  "version": "0.0.1",
+  "dependencies": {
+    "react": "16.8.1",
+    "react-native": "0.58.4",
+    "react-native-androw": "0.0.1"
+  },
+  "devDependencies": {
+    "babel-jest": "24.1.0",
+    "babel-preset-react-native": "^4.0.1",
+    "jest": "24.1.0",
+    "metro-react-native-babel-preset": "^0.51.1",
+    "react-test-renderer": "16.8.1"
+  },
+  "jest": {
+    "preset": "react-native"
+  },
+  "private": true,
+  "scripts": {
+    "android:apk": "cd android && ./gradlew assembleRelease",
+    "clear": "node node_modules/react-native/local-cli/cli.js start --reset-cache",
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  }
+}
