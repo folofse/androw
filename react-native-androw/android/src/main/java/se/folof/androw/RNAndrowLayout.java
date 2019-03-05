@@ -13,10 +13,12 @@ import com.facebook.react.views.view.ReactViewGroup;
 
 public class RNAndrowLayout extends ReactViewGroup {
 
+    private static int SAFE_AREA = 5;
+
     private int mShadowColor;
     private ReadableMap mShadowOffset;
-    private float mShadowOpacity;
-    private int mShadowRadius;
+    private float mShadowOpacity = 1.0f;
+    private int mShadowRadius = 0;
 
     private Paint mPaint;
     private Paint mOrgPaint;
@@ -58,6 +60,7 @@ public class RNAndrowLayout extends ReactViewGroup {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         this.mOriginalRect = new Rect(left, top, right, bottom);
+        this.updateClipping(left, top, right, bottom);
         super.onLayout(changed, left, top, right, bottom);
         try {
             ((ReactViewGroup) getParent()).setClipChildren(false);
@@ -69,8 +72,7 @@ public class RNAndrowLayout extends ReactViewGroup {
     @Override
     protected void dispatchDraw(Canvas canvas) {
 
-        if(this.getMeasuredWidth() > 0 && this.getMeasuredHeight() > 0 &&
-                this.mShadowRadius > 0){
+        if(this.getMeasuredWidth() > 0 && this.getMeasuredHeight() > 0){
 
             final Bitmap shadowBitmap = Bitmap.createBitmap(this.getMeasuredWidth(), this.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
             final Canvas sCanvas = new Canvas(shadowBitmap);
@@ -108,10 +110,13 @@ public class RNAndrowLayout extends ReactViewGroup {
 
             this.mPaint.setColor(this.mShadowColor);
             this.mPaint.setAlpha(Math.round(255*this.mShadowOpacity));
-            this.mPaint.setMaskFilter(new BlurMaskFilter(this.mShadowRadius, BlurMaskFilter.Blur.NORMAL));
-            
-            canvas.drawBitmap(shadowBitmap.extractAlpha(), shadowX, shadowY, this.mPaint);
-            canvas.drawBitmap(originalBitmap, orgX, orgY, this.mOrgPaint);
+            if(this.mShadowRadius > 0){
+                this.mPaint.setMaskFilter(new BlurMaskFilter(this.mShadowRadius, BlurMaskFilter.Blur.NORMAL));
+            }
+
+            //canvas.drawColor(0xFFFFFF00); //DEBUG
+            canvas.drawBitmap(shadowBitmap.extractAlpha(), shadowX+SAFE_AREA, shadowY+SAFE_AREA, this.mPaint);
+            canvas.drawBitmap(originalBitmap, orgX+SAFE_AREA, orgY+SAFE_AREA, this.mOrgPaint);
         }else{
             super.dispatchDraw(canvas);
         }
@@ -127,28 +132,27 @@ public class RNAndrowLayout extends ReactViewGroup {
             shadowY = this.mShadowOffset.getInt("height");
         }
 
+        int radius = this.mShadowRadius;
         if(shadowX < 0){
-            left -= ((shadowX*-1)+this.mShadowRadius);
-            right += this.mShadowRadius;
+            left -= ((shadowX*-1)+radius);
+            right += radius;
         }else{
-            left -= this.mShadowRadius;
-            right += shadowX+this.mShadowRadius;
+            left -= radius;
+            right += shadowX+radius;
         }
         if(shadowY < 0){
-            top -= ((shadowY*-1)+this.mShadowRadius);
-            bottom += this.mShadowRadius;
+            top -= ((shadowY*-1)+radius);
+            bottom += radius;
         }else{
-            top -= this.mShadowRadius;
-            bottom += shadowY+this.mShadowRadius;
+            top -= radius;
+            bottom += shadowY+radius;
         }
 
-        this.setLeft(left);
-        this.setRight(right);
-        this.setTop(top);
-        this.setBottom(bottom);
-
+        this.setLeft(left-SAFE_AREA);
+        this.setRight(right+SAFE_AREA);
+        this.setTop(top-SAFE_AREA);
+        this.setBottom(bottom+SAFE_AREA);
 
         this.updateClippingRect();
     }
-
 }
