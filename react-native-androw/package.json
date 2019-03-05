@@ -3,6 +3,7 @@
     "description": "Solve shadows in React Native for Android",
     "version": "0.0.16",
     "author": "Olof Larsson <olof@folof.se> (http://www.folof.se)",
+    "homepage": "https://github.com/folofse/androw",
     "keywords": [
       "react-native",
       "shadow",

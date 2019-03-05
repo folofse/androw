@@ -38,6 +38,7 @@ project.xcworkspace
 
 # Android/IntelliJ
 #
+.classpath
 .settings
 .project
 build/
