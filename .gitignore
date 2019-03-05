@@ -38,6 +38,8 @@ project.xcworkspace
 
 # Android/IntelliJ
 #
+.settings
+.project
 build/
 .idea
 .gradle
