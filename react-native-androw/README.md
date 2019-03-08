@@ -55,9 +55,9 @@ To make this work with FlatList and related components you need to replace `Cell
   keyExtractor={item => item.id}
   CellRendererComponent={Androw}
   renderItem={({ item, index }) => (
-      <ViewOverflow style={styles.item}>
+      <Androw style={styles.item}>
       // item....
-      </ViewOverflow>
+      </Androw>
    )}
 />
 ```
@@ -67,15 +67,15 @@ To make this work in place of an `Animated.View`, you need to use `Animated.crea
 
 ```
 import Androw from 'react-native-androw';
-const AnimatedViewOverflow = Animated.createAnimatedComponent(Androw);
+const AnimatedAndrow = Animated.createAnimatedComponent(Androw);
 ```
 
-You can then use `AnimatedViewOverflow` in place of `Animated.View`.
+You can then use `AnimatedAndrow` in place of `Animated.View`.
 
 ### Manual installation
 
 1. Open up `android/app/src/main/java/[...]/MainApplication.java`
-  - Add `import com.entria.views.RNViewOverflowPackage;` to the imports at the top of the file
+  - Add `import se.folof.RNAndrowPackage;` to the imports at the top of the file
   - Add `new RNAndrowPackage()` to the list returned by the `getPackages()` method
 2. Append the following lines to `android/settings.gradle`:
   	```

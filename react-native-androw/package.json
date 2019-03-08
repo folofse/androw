@@ -1,13 +1,11 @@
 {
     "name": "react-native-androw",
     "description": "Solve shadows in React Native for Android",
-    "version": "0.0.18",
+    "version": "0.0.19",
     "author": "Olof Larsson <olof@folof.se> (http://www.folof.se)",
     "homepage": "https://github.com/folofse/androw",
     "keywords": [
-      "react-native",
-      "shadow",
-      "android"
+      "react-native","shadow","android","drop shadow"
     ],
     "license": "MIT",
     "main": "src/index.js",
