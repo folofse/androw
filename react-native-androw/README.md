@@ -23,7 +23,7 @@ creates a bitmap representation, blur it and color it to styles shadow values li
 
 ### Mostly automatic installation
 
-`$ react-native link react-native-view-overflow`
+`$ react-native link react-native-androw`
 
 ## Usage
 ```javascript
