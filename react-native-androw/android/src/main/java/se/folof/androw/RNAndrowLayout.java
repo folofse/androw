@@ -4,155 +4,150 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorSpace;
 import android.graphics.Paint;
-import android.graphics.Rect;
 
+import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.uimanager.MeasureSpecAssertions;
 import com.facebook.react.views.view.ReactViewGroup;
-
 
 public class RNAndrowLayout extends ReactViewGroup {
 
-    private static int SAFE_AREA = 5;
+    private int mColor;
+    private float mRadius;
+    private float mOpacity;
+    private float shadowY;
+    private float shadowX;
 
-    private int mShadowColor;
-    private ReadableMap mShadowOffset;
-    private float mShadowOpacity = 1.0f;
-    private int mShadowRadius = 0;
+    private boolean shadowDirty;
+    private boolean contentDirty;
+    private boolean hasPositiveArea;
 
-    private Paint mPaint;
-    private Paint mOrgPaint;
-    private Rect mOriginalRect;
+    private boolean hasShadowColor;
+    private boolean hasShadowRadius;
+    private boolean hasShadowOpacity;
+
+    private final int[] offsetXY = {0, 0};
+    private final Paint shadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    private static final Bitmap.Config ARGB_8888 = Bitmap.Config.ARGB_8888;
+    private static final ColorSpace SRGB = ColorSpace.get(ColorSpace.Named.SRGB);
+
+    private Bitmap shadowBitmap = Bitmap.createBitmap(null, 1, 1, ARGB_8888, true, SRGB);
+    private Bitmap originalBitmap = Bitmap.createBitmap(null, 1, 1, ARGB_8888, true, SRGB);
+    private Canvas originalCanvas = new Canvas(originalBitmap);
 
     public RNAndrowLayout(Context context) {
         super(context);
-
-        this.mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        setLayerType(LAYER_TYPE_SOFTWARE, this.mPaint);
-        this.mOrgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        setLayerType(LAYER_TYPE_SOFTWARE, this.mOrgPaint);
     }
+
     public void setShadowOffset(ReadableMap offsetMap) {
-        this.mShadowOffset = offsetMap;
-        this.invalidate();
-    }
-    public void setShadowColor(int color) {
-        this.mShadowColor = color;
-        this.invalidate();
-    }
-    public void setShadowOpacity(float opacity) {
-        this.mShadowOpacity = opacity;
-        this.invalidate();
-    }
-    public void setShadowRadius(float radius) {
-        this.mShadowRadius = (int)radius;
-        this.invalidate();
-    }
+        boolean hasMap = offsetMap != null;
 
-    @Override
-    public void invalidate(){
-        if(this.mOriginalRect != null){
-            this.updateClipping(this.mOriginalRect.left, this.mOriginalRect.top, this.mOriginalRect.right, this.mOriginalRect.bottom);
+        if (hasMap && offsetMap.hasKey("width")) {
+            shadowX = (float) offsetMap.getDouble("width");
+        } else {
+            shadowX = 0f;
+        }
+
+        if (hasMap && offsetMap.hasKey("height")) {
+            shadowY = (float) offsetMap.getDouble("height");
+        } else {
+            shadowY = 0f;
         }
 
         super.invalidate();
     }
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        this.mOriginalRect = new Rect(left, top, right, bottom);
-        this.updateClipping(left, top, right, bottom);
-        super.onLayout(changed, left, top, right, bottom);
-        try {
-            ((ReactViewGroup) getParent()).setClipChildren(false);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+    public void setShadowColor(Integer color) {
+        hasShadowColor = color != null;
+        if (hasShadowColor && mColor != color) {
+            shadowPaint.setColor(color);
+            shadowDirty = true;
+            mColor = color;
         }
+        super.invalidate();
+    }
+
+    public void setShadowOpacity(Dynamic nullableOpacity) {
+        hasShadowOpacity = nullableOpacity != null && !nullableOpacity.isNull();
+        float opacity = hasShadowOpacity ? (float) nullableOpacity.asDouble() : 0f;
+        hasShadowOpacity &= opacity > 0f;
+        if (hasShadowOpacity && mOpacity != opacity) {
+            shadowPaint.setAlpha(Math.round(255 * opacity));
+            shadowDirty = true;
+            mOpacity = opacity;
+        }
+        super.invalidate();
+    }
+
+    public void setShadowRadius(Dynamic nullableRadius) {
+        hasShadowRadius = nullableRadius != null && !nullableRadius.isNull();
+        float radius = hasShadowRadius ? (float) nullableRadius.asDouble() : 0f;
+        hasShadowRadius &= radius > 0f;
+        if (hasShadowRadius && mRadius != radius) {
+            shadowPaint.setMaskFilter(new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL));
+            shadowDirty = true;
+            mRadius = radius;
+        }
+        super.invalidate();
+    }
+
+    public void invalidate() {
+        super.invalidate();
+        shadowDirty = true;
+        contentDirty = true;
     }
 
     @Override
-    protected void dispatchDraw(Canvas canvas) {
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        MeasureSpecAssertions.assertExplicitMeasureSpec(widthMeasureSpec, heightMeasureSpec);
+        int measuredHeight = MeasureSpec.getSize(heightMeasureSpec);
+        int measuredWidth = MeasureSpec.getSize(widthMeasureSpec);
+        setMeasuredDimension(measuredWidth, measuredHeight);
+        int area = measuredWidth * measuredHeight;
+        hasPositiveArea = area > 0;
+        /*
+        if (originalBitmap != null && area * 32 < originalBitmap.getAllocationByteCount()) {
+            originalBitmap.reconfigure(measuredWidth, measuredHeight, ARGB_8888);
+        }
+        */
+        if (hasPositiveArea) {
+            if (originalBitmap.getWidth() == measuredWidth && originalBitmap.getHeight() == measuredHeight) {
+                return;
+            }
+            originalBitmap.recycle();
+            originalBitmap = Bitmap.createBitmap(null, measuredWidth, measuredHeight, ARGB_8888, true, SRGB);
+            // originalBitmap = Bitmap.createScaledBitmap(originalBitmap, measuredWidth, measuredHeight, false);
+            originalCanvas.setBitmap(originalBitmap);
+        }
+        invalidate();
+    }
 
-        if(this.getMeasuredWidth() > 0 && this.getMeasuredHeight() > 0){
-
-            final Bitmap shadowBitmap = Bitmap.createBitmap(this.getMeasuredWidth(), this.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-            final Canvas sCanvas = new Canvas(shadowBitmap);
-            super.dispatchDraw(sCanvas);
-
-            final Bitmap originalBitmap = shadowBitmap.copy(Bitmap.Config.ARGB_8888, true);
-
-
-            int shadowX = 0;
-            if(this.mShadowOffset != null && this.mShadowOffset.hasKey("width")){
-                shadowX = this.mShadowOffset.getInt("width");
+    @Override
+    public void dispatchDraw(Canvas canvas) {
+        if (hasPositiveArea) {
+            if (contentDirty) {
+                originalBitmap.eraseColor(Color.TRANSPARENT);
+                super.dispatchDraw(originalCanvas);
+                contentDirty = false;
             }
 
-            int shadowY = 0;
-            if(this.mShadowOffset != null && this.mShadowOffset.hasKey("height")){
-                shadowY = this.mShadowOffset.getInt("height");
+            if (hasShadowRadius && hasShadowColor && hasShadowOpacity) {
+                if (shadowDirty) {
+                    shadowBitmap.recycle();
+                    shadowBitmap = originalBitmap.extractAlpha(shadowPaint, offsetXY);
+                    shadowDirty = false;
+                }
+                canvas.drawBitmap(shadowBitmap, offsetXY[0] + shadowX, offsetXY[1] + shadowY, null);
             }
 
-
-            int orgX = this.mShadowRadius;
-            int orgY = this.mShadowRadius;
-            if(shadowX < 0){
-                orgX = (shadowX*-1)+this.mShadowRadius;
-                shadowX = this.mShadowRadius;
-            }else{
-                shadowX += this.mShadowRadius;
-            }
-            if(shadowY < 0){
-                orgY = (shadowY*-1)+this.mShadowRadius;
-                shadowY = this.mShadowRadius;
-            }else{
-                shadowY += this.mShadowRadius;
-            }
-
-
-            this.mPaint.setColor(this.mShadowColor);
-            this.mPaint.setAlpha(Math.round(255*this.mShadowOpacity));
-            if(this.mShadowRadius > 0){
-                this.mPaint.setMaskFilter(new BlurMaskFilter(this.mShadowRadius, BlurMaskFilter.Blur.NORMAL));
-            }
-
-            //canvas.drawColor(0xFFFFFF00); //DEBUG
-            canvas.drawBitmap(shadowBitmap.extractAlpha(), shadowX+SAFE_AREA, shadowY+SAFE_AREA, this.mPaint);
-            canvas.drawBitmap(originalBitmap, orgX+SAFE_AREA, orgY+SAFE_AREA, this.mOrgPaint);
-        }else{
+            canvas.drawBitmap(originalBitmap, 0f, 0f, null);
+        } else {
             super.dispatchDraw(canvas);
         }
     }
-    private void updateClipping(int left, int top, int right, int bottom ){
-        int shadowX = 0;
-        if(this.mShadowOffset  != null && this.mShadowOffset.hasKey("width")){
-            shadowX = this.mShadowOffset.getInt("width");
-        }
 
-        int shadowY = 0;
-        if(this.mShadowOffset  != null && this.mShadowOffset.hasKey("height")){
-            shadowY = this.mShadowOffset.getInt("height");
-        }
-
-        int radius = this.mShadowRadius;
-        if(shadowX < 0){
-            left -= ((shadowX*-1)+radius);
-            right += radius;
-        }else{
-            left -= radius;
-            right += shadowX+radius;
-        }
-        if(shadowY < 0){
-            top -= ((shadowY*-1)+radius);
-            bottom += radius;
-        }else{
-            top -= radius;
-            bottom += shadowY+radius;
-        }
-
-        this.setLeft(left-SAFE_AREA);
-        this.setRight(right+SAFE_AREA);
-        this.setTop(top-SAFE_AREA);
-        this.setBottom(bottom+SAFE_AREA);
-
-        this.updateClippingRect();
-    }
 }
