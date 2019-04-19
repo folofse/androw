@@ -5,7 +5,15 @@
  */
 
 import React, { Component } from 'react';
-import { Button, Platform, StyleSheet, Text, View } from 'react-native';
+import {
+  Button,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Animated,
+  Easing,
+} from 'react-native';
 
 import Androw from 'react-native-androw';
 
@@ -16,18 +24,49 @@ const instructions = Platform.select({
     'Shake or press menu (Cmd/Ctrl+M) button for dev menu',
 });
 
+const AnimatedAndrow = Animated.createAnimatedComponent(Androw);
+
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { toggled: false };
+    this.state = { toggled: false, anim: new Animated.Value(0) };
   }
+
+  startAnimation() {
+    Animated.loop(
+      Animated.timing(this.state.anim, {
+        easing: Easing.linear,
+        duration: 3000,
+        toValue: 1,
+      }),
+    ).start();
+  }
+
+  componentDidMount() {
+    this.startAnimation();
+  }
+
   onPress() {
     console.log('onPress');
     this.setState({ toggled: !this.state.toggled });
   }
+
+  radius = 5;
+  offsetX = 3;
+  offsetY = 3;
+  samples = 30;
+  phase = Math.PI / 4;
+  input = Array.from({ length: this.samples }).map(
+    (_, i) => i / (this.samples - 1),
+  );
+  x = this.input.map(
+    x => Math.cos(x * 2 * Math.PI + this.phase) * this.radius + this.offsetX,
+  );
+  y = this.input.map(
+    x => Math.sin(x * 2 * Math.PI + this.phase) * this.radius + this.offsetY,
+  );
+
   render() {
-    const shadowStyle = true ? styles.shadow : styles.noShadow;
-    console.log(shadowStyle);
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>Welcome to React Native!</Text>
@@ -36,9 +75,46 @@ export default class App extends Component {
         </Text>
         <Text style={styles.instructions}>{instructions}</Text>
 
-        <Androw style={[shadowStyle, {
-          shadowColor: this.state.toggled ? '#f00':'#00f',
-        }]}>
+        <AnimatedAndrow
+          style={
+            this.state.toggled
+              ? styles.androw
+              : [
+                  styles.androw,
+                  {
+                    shadowColor: this.state.anim.interpolate({
+                      inputRange: Array.from({ length: 7 }).map(
+                        (_, i) => i / 6,
+                      ),
+                      outputRange: [
+                        '#f00',
+                        '#ff0',
+                        '#0f0',
+                        '#0ff',
+                        '#00f',
+                        '#f0f',
+                        '#f00',
+                      ],
+                    }),
+                    shadowOpacity: this.state.anim.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [0.5, 1, 0.5],
+                    }),
+                    shadowRadius: 10,
+                    shadowOffset: {
+                      width: this.state.anim.interpolate({
+                        inputRange: this.input,
+                        outputRange: this.x,
+                      }),
+                      height: this.state.anim.interpolate({
+                        inputRange: this.input,
+                        outputRange: this.y,
+                      }),
+                    },
+                  },
+                ]
+          }
+        >
           <View
             style={{
               width: 50,
@@ -60,10 +136,10 @@ export default class App extends Component {
           <Text style={{ color: 'black', fontSize: 18, marginTop: 10 }}>
             A text view with shadow
           </Text>
-        </Androw>
+        </AnimatedAndrow>
 
         <View style={{ paddingTop: 50 }}>
-          <Button onPress={this.onPress.bind(this)} title="Toggle shadow color" />
+          <Button onPress={this.onPress.bind(this)} title="Toggle shadow" />
         </View>
       </View>
     );
@@ -87,19 +163,8 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
-  noShadow: {
+  androw: {
     justifyContent: 'center',
     alignItems: 'flex-start',
-  },
-  shadow: {
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    shadowColor: '#000',
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
   },
 });
