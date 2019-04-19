@@ -86,19 +86,17 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   noShadow: {
-    position: 'absolute',
     justifyContent: 'center',
     alignItems: 'flex-start',
   },
   shadow: {
-    position: 'absolute',
     justifyContent: 'center',
     alignItems: 'flex-start',
     shadowColor: '#000',
     shadowOpacity: 0.5,
-    shadowRadius: 20,
+    shadowRadius: 10,
     shadowOffset: {
-      width: -10,
+      width: 0,
       height: 0,
     },
   },

@@ -34,10 +34,12 @@ public class RNAndrowLayout extends ReactViewGroup {
 
     private static final Bitmap.Config ARGB_8888 = Bitmap.Config.ARGB_8888;
     private static final ColorSpace SRGB = ColorSpace.get(ColorSpace.Named.SRGB);
+    private static final BlurMaskFilter.Blur NORMAL = BlurMaskFilter.Blur.NORMAL;
 
     private Bitmap shadowBitmap = Bitmap.createBitmap(null, 1, 1, ARGB_8888, true, SRGB);
     private Bitmap originalBitmap = Bitmap.createBitmap(null, 1, 1, ARGB_8888, true, SRGB);
     private Canvas originalCanvas = new Canvas(originalBitmap);
+    private boolean originalBitmapHasContent;
 
     public RNAndrowLayout(Context context) {
         super(context);
@@ -88,7 +90,7 @@ public class RNAndrowLayout extends ReactViewGroup {
         float radius = hasShadowRadius ? (float) nullableRadius.asDouble() : 0f;
         hasShadowRadius &= radius > 0f;
         if (hasShadowRadius && mRadius != radius) {
-            shadowPaint.setMaskFilter(new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL));
+            shadowPaint.setMaskFilter(new BlurMaskFilter(radius, NORMAL));
             shadowDirty = true;
             mRadius = radius;
         }
@@ -96,31 +98,26 @@ public class RNAndrowLayout extends ReactViewGroup {
     }
 
     public void invalidate() {
-        super.invalidate();
-        shadowDirty = true;
         contentDirty = true;
+        shadowDirty = true;
+        super.invalidate();
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         MeasureSpecAssertions.assertExplicitMeasureSpec(widthMeasureSpec, heightMeasureSpec);
-        int measuredHeight = MeasureSpec.getSize(heightMeasureSpec);
-        int measuredWidth = MeasureSpec.getSize(widthMeasureSpec);
-        setMeasuredDimension(measuredWidth, measuredHeight);
-        int area = measuredWidth * measuredHeight;
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        setMeasuredDimension(width, height);
+        int area = width * height;
         hasPositiveArea = area > 0;
-        /*
-        if (originalBitmap != null && area * 32 < originalBitmap.getAllocationByteCount()) {
-            originalBitmap.reconfigure(measuredWidth, measuredHeight, ARGB_8888);
-        }
-        */
         if (hasPositiveArea) {
-            if (originalBitmap.getWidth() == measuredWidth && originalBitmap.getHeight() == measuredHeight) {
+            if (originalBitmap.getWidth() == width && originalBitmap.getHeight() == height) {
                 return;
             }
             originalBitmap.recycle();
-            originalBitmap = Bitmap.createBitmap(null, measuredWidth, measuredHeight, ARGB_8888, true, SRGB);
-            // originalBitmap = Bitmap.createScaledBitmap(originalBitmap, measuredWidth, measuredHeight, false);
+            originalBitmapHasContent = false;
+            originalBitmap = Bitmap.createBitmap(null, width, height, ARGB_8888, true, SRGB);
             originalCanvas.setBitmap(originalBitmap);
         }
         invalidate();
@@ -130,8 +127,11 @@ public class RNAndrowLayout extends ReactViewGroup {
     public void dispatchDraw(Canvas canvas) {
         if (hasPositiveArea) {
             if (contentDirty) {
-                originalBitmap.eraseColor(Color.TRANSPARENT);
+                if (originalBitmapHasContent) {
+                    originalBitmap.eraseColor(Color.TRANSPARENT);
+                }
                 super.dispatchDraw(originalCanvas);
+                originalBitmapHasContent = true;
                 contentDirty = false;
             }
 
