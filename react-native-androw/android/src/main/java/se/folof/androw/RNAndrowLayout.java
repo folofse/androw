@@ -109,8 +109,7 @@ public class RNAndrowLayout extends ReactViewGroup {
         int height = MeasureSpec.getSize(heightMeasureSpec);
         int width = MeasureSpec.getSize(widthMeasureSpec);
         setMeasuredDimension(width, height);
-        int area = width * height;
-        hasPositiveArea = area > 0;
+        hasPositiveArea = width > 0 && height > 0;
         if (hasPositiveArea) {
             if (originalBitmap.getWidth() == width && originalBitmap.getHeight() == height) {
                 return;
