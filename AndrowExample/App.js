@@ -26,7 +26,7 @@ export default class App extends Component {
     this.setState({ toggled: !this.state.toggled });
   }
   render() {
-    const shadowStyle = this.state.toggled ? styles.shadow : styles.noShadow;
+    const shadowStyle = true ? styles.shadow : styles.noShadow;
     console.log(shadowStyle);
     return (
       <View style={styles.container}>
@@ -36,7 +36,9 @@ export default class App extends Component {
         </Text>
         <Text style={styles.instructions}>{instructions}</Text>
 
-        <Androw style={shadowStyle}>
+        <Androw style={[shadowStyle, {
+          shadowColor: this.state.toggled ? '#f00':'#00f',
+        }]}>
           <View
             style={{
               width: 50,
@@ -61,7 +63,7 @@ export default class App extends Component {
         </Androw>
 
         <View style={{ paddingTop: 50 }}>
-          <Button onPress={this.onPress.bind(this)} title="Toggle shadow" />
+          <Button onPress={this.onPress.bind(this)} title="Toggle shadow color" />
         </View>
       </View>
     );

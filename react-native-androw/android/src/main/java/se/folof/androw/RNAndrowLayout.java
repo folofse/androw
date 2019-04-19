@@ -30,6 +30,7 @@ public class RNAndrowLayout extends ReactViewGroup {
     private boolean hasShadowOpacity;
 
     private final int[] offsetXY = {0, 0};
+    private final Paint blurPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint shadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private static final Bitmap.Config ARGB_8888 = Bitmap.Config.ARGB_8888;
@@ -67,7 +68,6 @@ public class RNAndrowLayout extends ReactViewGroup {
         hasShadowColor = color != null;
         if (hasShadowColor && mColor != color) {
             shadowPaint.setColor(color);
-            shadowDirty = true;
             mColor = color;
         }
         super.invalidate();
@@ -79,7 +79,6 @@ public class RNAndrowLayout extends ReactViewGroup {
         hasShadowOpacity &= opacity > 0f;
         if (hasShadowOpacity && mOpacity != opacity) {
             shadowPaint.setAlpha(Math.round(255 * opacity));
-            shadowDirty = true;
             mOpacity = opacity;
         }
         super.invalidate();
@@ -90,7 +89,7 @@ public class RNAndrowLayout extends ReactViewGroup {
         float radius = hasShadowRadius ? (float) nullableRadius.asDouble() : 0f;
         hasShadowRadius &= radius > 0f;
         if (hasShadowRadius && mRadius != radius) {
-            shadowPaint.setMaskFilter(new BlurMaskFilter(radius, NORMAL));
+            blurPaint.setMaskFilter(new BlurMaskFilter(radius, NORMAL));
             shadowDirty = true;
             mRadius = radius;
         }
@@ -124,6 +123,8 @@ public class RNAndrowLayout extends ReactViewGroup {
 
     @Override
     public void dispatchDraw(Canvas canvas) {
+        //long start = System.nanoTime();
+
         if (hasPositiveArea) {
             if (contentDirty) {
                 if (originalBitmapHasContent) {
@@ -137,16 +138,18 @@ public class RNAndrowLayout extends ReactViewGroup {
             if (hasShadowRadius && hasShadowColor && hasShadowOpacity) {
                 if (shadowDirty) {
                     shadowBitmap.recycle();
-                    shadowBitmap = originalBitmap.extractAlpha(shadowPaint, offsetXY);
+                    shadowBitmap = originalBitmap.extractAlpha(blurPaint, offsetXY);
                     shadowDirty = false;
                 }
-                canvas.drawBitmap(shadowBitmap, offsetXY[0] + shadowX, offsetXY[1] + shadowY, null);
+                canvas.drawBitmap(shadowBitmap, offsetXY[0] + shadowX, offsetXY[1] + shadowY, shadowPaint);
             }
 
             canvas.drawBitmap(originalBitmap, 0f, 0f, null);
         } else {
             super.dispatchDraw(canvas);
         }
+
+        //Log.i("Androw draw nano seconds", Long.toString(System.nanoTime() - start));
     }
 
 }
