@@ -1,5 +1,6 @@
 package se.folof.androw;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
@@ -103,6 +104,7 @@ public class RNAndrowLayout extends ReactViewGroup {
     }
 
     @Override
+    @SuppressLint("DrawAllocation")
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         MeasureSpecAssertions.assertExplicitMeasureSpec(widthMeasureSpec, heightMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
