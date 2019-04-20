@@ -6,9 +6,11 @@ import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorSpace;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewParent;
 
 import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.ReadableMap;
@@ -18,6 +20,7 @@ import com.facebook.react.views.view.ReactViewGroup;
 import androidx.annotation.NonNull;
 
 public class RNAndrowLayout extends ReactViewGroup {
+    public static final String ANDROW = "Androw";
 
     private int mColor;
     private float mRadius;
@@ -38,11 +41,10 @@ public class RNAndrowLayout extends ReactViewGroup {
     private final Paint shadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private static final Bitmap.Config ARGB_8888 = Bitmap.Config.ARGB_8888;
-    private static final ColorSpace SRGB = ColorSpace.get(ColorSpace.Named.SRGB);
     private static final BlurMaskFilter.Blur NORMAL = BlurMaskFilter.Blur.NORMAL;
 
-    private Bitmap shadowBitmap = Bitmap.createBitmap(null, 1, 1, ARGB_8888, true, SRGB);
-    private Bitmap originalBitmap = Bitmap.createBitmap(null, 1, 1, ARGB_8888, true, SRGB);
+    private Bitmap shadowBitmap = Bitmap.createBitmap(1, 1, ARGB_8888);
+    private Bitmap originalBitmap = Bitmap.createBitmap(1, 1, ARGB_8888);
     private Canvas originalCanvas = new Canvas(originalBitmap);
     private boolean originalBitmapHasContent;
 
@@ -100,12 +102,22 @@ public class RNAndrowLayout extends ReactViewGroup {
         super.invalidate();
     }
 
+    @Override
+    @SuppressWarnings("deprecation")
+    public ViewParent invalidateChildInParent(final int[] location, final Rect dirty) {
+        contentDirty = true;
+        shadowDirty = true;
+        return super.invalidateChildInParent(location, dirty);
+    }
+
+    @Override
     public void onDescendantInvalidated(@NonNull View child, @NonNull View target) {
         super.onDescendantInvalidated(child, target);
         contentDirty = true;
         shadowDirty = true;
     }
 
+    @Override
     public void invalidate() {
         contentDirty = true;
         shadowDirty = true;
@@ -126,7 +138,7 @@ public class RNAndrowLayout extends ReactViewGroup {
             }
             originalBitmap.recycle();
             originalBitmapHasContent = false;
-            originalBitmap = Bitmap.createBitmap(null, width, height, ARGB_8888, true, SRGB);
+            originalBitmap = Bitmap.createBitmap(width, height, ARGB_8888);
             originalCanvas.setBitmap(originalBitmap);
         }
         invalidate();
@@ -134,7 +146,7 @@ public class RNAndrowLayout extends ReactViewGroup {
 
     @Override
     public void dispatchDraw(Canvas canvas) {
-        //long start = System.nanoTime();
+        long start = System.nanoTime();
 
         if (hasPositiveArea) {
             if (contentDirty) {
@@ -160,7 +172,6 @@ public class RNAndrowLayout extends ReactViewGroup {
             super.dispatchDraw(canvas);
         }
 
-        //Log.i("Androw draw nano seconds", Long.toString(System.nanoTime() - start));
+        Log.i(ANDROW, Long.toString(System.nanoTime() - start));
     }
-
 }

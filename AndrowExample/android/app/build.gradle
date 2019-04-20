@@ -99,11 +99,8 @@ android {
 
     defaultConfig {
         applicationId "se.folof.androwexample"
-        minSdkVersion 26
+        minSdkVersion 16
         targetSdkVersion 28
-
-        renderscriptTargetApi 28
-        renderscriptSupportModeEnabled true
 
         versionCode 1
         versionName "1.0"
