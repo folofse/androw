@@ -32,7 +32,6 @@ public class RNAndrowLayout extends ReactViewGroup {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint blur = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Canvas draw = new Canvas(content);
-    private final int[] blurXY = {0, 0};
 
     private boolean contentDirty;
     private boolean shadowDirty;
@@ -61,8 +60,8 @@ public class RNAndrowLayout extends ReactViewGroup {
             dY = 0f;
         }
 
-        x = blurXY[0] + dX;
-        y = blurXY[1] + dY;
+        x = dX - mRadius;
+        y = dY - mRadius;
 
         super.invalidate();
     }
@@ -95,6 +94,8 @@ public class RNAndrowLayout extends ReactViewGroup {
             blur.setMaskFilter(new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL));
             shadowDirty = true;
             mRadius = radius;
+            x = dX - mRadius;
+            y = dY - mRadius;
         }
         super.invalidate();
     }
@@ -155,10 +156,8 @@ public class RNAndrowLayout extends ReactViewGroup {
             if (hasRadius && hasColor && hasOpacity) {
                 if (shadowDirty) {
                     shadow.recycle();
-                    shadow = content.extractAlpha(blur, blurXY);
+                    shadow = content.extractAlpha(blur, null);
                     shadowDirty = false;
-                    x = blurXY[0] + dX;
-                    y = blurXY[1] + dY;
                 }
                 canvas.drawBitmap(shadow, x, y, paint);
             }
