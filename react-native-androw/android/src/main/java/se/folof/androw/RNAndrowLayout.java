@@ -24,6 +24,8 @@ public class RNAndrowLayout extends ReactViewGroup {
     private float mOpacity;
     private float dX;
     private float dY;
+    private float x;
+    private float y;
 
     private Bitmap shadow = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
     private Bitmap content = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
@@ -58,6 +60,9 @@ public class RNAndrowLayout extends ReactViewGroup {
         } else {
             dY = 0f;
         }
+
+        x = blurXY[0] + dX;
+        y = blurXY[1] + dY;
 
         super.invalidate();
     }
@@ -152,8 +157,10 @@ public class RNAndrowLayout extends ReactViewGroup {
                     shadow.recycle();
                     shadow = content.extractAlpha(blur, blurXY);
                     shadowDirty = false;
+                    x = blurXY[0] + dX;
+                    y = blurXY[1] + dY;
                 }
-                canvas.drawBitmap(shadow, blurXY[0] + dX, blurXY[1] + dY, paint);
+                canvas.drawBitmap(shadow, x, y, paint);
             }
 
             canvas.drawBitmap(content, 0f, 0f, null);

@@ -27,10 +27,7 @@ const instructions = Platform.select({
 const AnimatedAndrow = Animated.createAnimatedComponent(Androw);
 
 export default class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { toggled: false, anim: new Animated.Value(0) };
-  }
+  state = { toggled: false, anim: new Animated.Value(0) };
 
   startAnimation() {
     Animated.loop(
@@ -47,7 +44,6 @@ export default class App extends Component {
   }
 
   onPress() {
-    console.log('onPress');
     this.setState({ toggled: !this.state.toggled });
   }
 
