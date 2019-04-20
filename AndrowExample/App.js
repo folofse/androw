@@ -121,7 +121,7 @@ export default class App extends Component {
               height: 50,
               borderRadius: 999,
               marginTop: 10,
-              backgroundColor: '#00ff00',
+              backgroundColor: this.state.toggled ? '#00ff00':'#0000ff',
             }}
           />
           <View
@@ -134,7 +134,7 @@ export default class App extends Component {
             }}
           />
           <Text style={{ color: 'black', fontSize: 18, marginTop: 10 }}>
-            A text view with shadow
+            A text view with shadow {this.state.toggled ? '#00ff00':'#0000ff'}
           </Text>
         </AnimatedAndrow>
 

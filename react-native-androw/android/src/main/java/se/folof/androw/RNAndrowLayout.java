@@ -8,11 +8,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorSpace;
 import android.graphics.Paint;
+import android.view.View;
 
 import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.MeasureSpecAssertions;
 import com.facebook.react.views.view.ReactViewGroup;
+
+import androidx.annotation.NonNull;
 
 public class RNAndrowLayout extends ReactViewGroup {
 
@@ -95,6 +98,12 @@ public class RNAndrowLayout extends ReactViewGroup {
             mRadius = radius;
         }
         super.invalidate();
+    }
+
+    public void onDescendantInvalidated(@NonNull View child, @NonNull View target) {
+        super.onDescendantInvalidated(child, target);
+        contentDirty = true;
+        shadowDirty = true;
     }
 
     public void invalidate() {
