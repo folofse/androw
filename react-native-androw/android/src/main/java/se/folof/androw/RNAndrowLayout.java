@@ -8,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewParent;
 
@@ -20,7 +19,6 @@ import com.facebook.react.views.view.ReactViewGroup;
 import androidx.annotation.NonNull;
 
 public class RNAndrowLayout extends ReactViewGroup {
-    public static final String ANDROW = "Androw";
 
     private int mColor;
     private float mRadius;
@@ -40,11 +38,8 @@ public class RNAndrowLayout extends ReactViewGroup {
     private final Paint blurPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint shadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    private static final Bitmap.Config ARGB_8888 = Bitmap.Config.ARGB_8888;
-    private static final BlurMaskFilter.Blur NORMAL = BlurMaskFilter.Blur.NORMAL;
-
-    private Bitmap shadowBitmap = Bitmap.createBitmap(1, 1, ARGB_8888);
-    private Bitmap originalBitmap = Bitmap.createBitmap(1, 1, ARGB_8888);
+    private Bitmap shadowBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+    private Bitmap originalBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
     private Canvas originalCanvas = new Canvas(originalBitmap);
     private boolean originalBitmapHasContent;
 
@@ -95,7 +90,7 @@ public class RNAndrowLayout extends ReactViewGroup {
         float radius = hasShadowRadius ? (float) nullableRadius.asDouble() : 0f;
         hasShadowRadius &= radius > 0f;
         if (hasShadowRadius && mRadius != radius) {
-            blurPaint.setMaskFilter(new BlurMaskFilter(radius, NORMAL));
+            blurPaint.setMaskFilter(new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL));
             shadowDirty = true;
             mRadius = radius;
         }
@@ -138,7 +133,7 @@ public class RNAndrowLayout extends ReactViewGroup {
             }
             originalBitmap.recycle();
             originalBitmapHasContent = false;
-            originalBitmap = Bitmap.createBitmap(width, height, ARGB_8888);
+            originalBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             originalCanvas.setBitmap(originalBitmap);
         }
         invalidate();
@@ -146,8 +141,6 @@ public class RNAndrowLayout extends ReactViewGroup {
 
     @Override
     public void dispatchDraw(Canvas canvas) {
-        long start = System.nanoTime();
-
         if (hasPositiveArea) {
             if (contentDirty) {
                 if (originalBitmapHasContent) {
@@ -171,7 +164,5 @@ public class RNAndrowLayout extends ReactViewGroup {
         } else {
             super.dispatchDraw(canvas);
         }
-
-        Log.i(ANDROW, Long.toString(System.nanoTime() - start));
     }
 }
