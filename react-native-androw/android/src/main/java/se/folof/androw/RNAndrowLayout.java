@@ -26,10 +26,10 @@ public class RNAndrowLayout extends ReactViewGroup {
     private float dY;
 
     private Bitmap shadow = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-    private Bitmap original = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+    private Bitmap content = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint blur = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Canvas draw = new Canvas(original);
+    private final Canvas draw = new Canvas(content);
     private final int[] blurXY = {0, 0};
 
     private boolean contentDirty;
@@ -124,13 +124,13 @@ public class RNAndrowLayout extends ReactViewGroup {
         setMeasuredDimension(width, height);
         hasArea = width > 0 && height > 0;
         if (hasArea) {
-            if (original.getWidth() == width && original.getHeight() == height) {
+            if (content.getWidth() == width && content.getHeight() == height) {
                 return;
             }
-            original.recycle();
+            content.recycle();
             hasContent = false;
-            original = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            draw.setBitmap(original);
+            content = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            draw.setBitmap(content);
         }
         invalidate();
     }
@@ -140,7 +140,7 @@ public class RNAndrowLayout extends ReactViewGroup {
         if (hasArea) {
             if (contentDirty) {
                 if (hasContent) {
-                    original.eraseColor(Color.TRANSPARENT);
+                    content.eraseColor(Color.TRANSPARENT);
                 }
                 super.dispatchDraw(draw);
                 contentDirty = false;
@@ -150,13 +150,13 @@ public class RNAndrowLayout extends ReactViewGroup {
             if (hasRadius && hasColor && hasOpacity) {
                 if (shadowDirty) {
                     shadow.recycle();
-                    shadow = original.extractAlpha(blur, blurXY);
+                    shadow = content.extractAlpha(blur, blurXY);
                     shadowDirty = false;
                 }
                 canvas.drawBitmap(shadow, blurXY[0] + dX, blurXY[1] + dY, paint);
             }
 
-            canvas.drawBitmap(original, 0f, 0f, null);
+            canvas.drawBitmap(content, 0f, 0f, null);
         } else {
             super.dispatchDraw(canvas);
         }
