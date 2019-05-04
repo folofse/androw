@@ -2,7 +2,7 @@
 
 ## NOTE
 
-This version is still under development and in beta. The reason its published is for easier testing.
+This version is still under development and in beta.
 
 
 ## Motivation
