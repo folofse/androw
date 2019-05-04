@@ -21,13 +21,10 @@ android {
     buildToolsVersion rootProject.hasProperty('buildToolsVersion') ? rootProject.buildToolsVersion : DEFAULT_BUILD_TOOLS_VERSION
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 16
         targetSdkVersion rootProject.hasProperty('targetSdkVersion') ? rootProject.targetSdkVersion : DEFAULT_TARGET_SDK_VERSION
         versionCode 1
         versionName "1.0"
-
-        renderscriptTargetApi 28
-        renderscriptSupportModeEnabled true
     }
     lintOptions {
         abortOnError false

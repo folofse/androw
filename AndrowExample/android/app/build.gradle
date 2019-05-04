@@ -99,11 +99,8 @@ android {
 
     defaultConfig {
         applicationId "se.folof.androwexample"
-        minSdkVersion 28
+        minSdkVersion 16
         targetSdkVersion 28
-
-        renderscriptTargetApi 28
-        renderscriptSupportModeEnabled true
 
         versionCode 1
         versionName "1.0"
@@ -119,8 +116,19 @@ android {
             include "armeabi-v7a", "x86"
         }
     }
+    signingConfigs {
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
+    }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
