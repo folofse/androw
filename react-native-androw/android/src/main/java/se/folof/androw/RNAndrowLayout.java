@@ -159,7 +159,7 @@ public class RNAndrowLayout extends ReactViewGroup {
                     shadow = content.extractAlpha(blur, null);
                     shadowDirty = false;
                 }
-                canvas.drawBitmap(shadow, x, y, paint);
+                canvas.drawBitmap(shadow, x-(mRadius/2), y-(mRadius/2), paint);
             }
 
             canvas.drawBitmap(content, 0f, 0f, null);
