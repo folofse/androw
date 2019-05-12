@@ -15,7 +15,7 @@ import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.views.view.ReactViewGroup;
 
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 public class RNAndrowLayout extends ReactViewGroup {
 
@@ -60,8 +60,6 @@ public class RNAndrowLayout extends ReactViewGroup {
             dY = 0f;
         }
 
-        x = dX - mRadius;
-        y = dY - mRadius;
 
         super.invalidate();
     }
@@ -93,9 +91,8 @@ public class RNAndrowLayout extends ReactViewGroup {
         if (hasRadius && mRadius != radius) {
             blur.setMaskFilter(new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL));
             shadowDirty = true;
-            mRadius = radius;
-            x = dX - mRadius;
-            y = dY - mRadius;
+            mRadius = radius*2;
+
         }
         super.invalidate();
     }
@@ -153,13 +150,18 @@ public class RNAndrowLayout extends ReactViewGroup {
                 hasContent = true;
             }
 
-            if (hasRadius && hasColor && hasOpacity) {
+            if (hasColor && hasOpacity) {
                 if (shadowDirty) {
                     shadow.recycle();
                     shadow = content.extractAlpha(blur, null);
+
                     shadowDirty = false;
                 }
-                canvas.drawBitmap(shadow, x-(mRadius/2), y-(mRadius/2), paint);
+
+                x = dX - (mRadius*0.8f);
+                y = dY - (mRadius*0.8f);
+
+                canvas.drawBitmap(shadow, x, y, paint);
             }
 
             canvas.drawBitmap(content, 0f, 0f, null);
