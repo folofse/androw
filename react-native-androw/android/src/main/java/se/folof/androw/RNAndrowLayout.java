@@ -68,6 +68,7 @@ public class RNAndrowLayout extends ReactViewGroup {
         hasColor = color != null;
         if (hasColor && mColor != color) {
             paint.setColor(color);
+            paint.setAlpha(Math.round(255 * mOpacity));
             mColor = color;
         }
         super.invalidate();
@@ -158,8 +159,8 @@ public class RNAndrowLayout extends ReactViewGroup {
                     shadowDirty = false;
                 }
 
-                x = dX - (mRadius*0.8f);
-                y = dY - (mRadius*0.8f);
+                x = dX - (mRadius*0.85f);
+                y = dY - (mRadius*0.85f);
 
                 canvas.drawBitmap(shadow, x, y, paint);
             }
