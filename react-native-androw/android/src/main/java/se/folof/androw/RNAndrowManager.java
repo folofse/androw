@@ -1,18 +1,25 @@
 package se.folof.androw;
 
+
+import android.view.View;
+
 import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
+
 public class RNAndrowManager extends ViewGroupManager<RNAndrowLayout> {
 
     public static final String REACT_CLASS = "RNAndrow";
+    public RNAndrowImageListener imageListener;
 
     @Override
     protected RNAndrowLayout createViewInstance(ThemedReactContext reactContext) {
-        return new RNAndrowLayout(reactContext);
+        final RNAndrowLayout androwLayout = new RNAndrowLayout(reactContext);
+        this.imageListener = new RNAndrowImageListener(reactContext, androwLayout);
+        return androwLayout;
     }
 
     @Override
@@ -39,4 +46,12 @@ public class RNAndrowManager extends ViewGroupManager<RNAndrowLayout> {
     public void setShadowRadius(RNAndrowLayout view, Dynamic radius) {
         view.setShadowRadius(radius);
     }
+
+    @Override
+    public void addView(RNAndrowLayout parent, View child, int index) {
+        this.imageListener.setImageOnLoadListerners(child);
+        super.addView(parent, child, index);
+    }
+
+
 }

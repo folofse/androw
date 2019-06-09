@@ -60,7 +60,6 @@ public class RNAndrowLayout extends ReactViewGroup {
             dY = 0f;
         }
 
-
         super.invalidate();
     }
 
@@ -68,7 +67,6 @@ public class RNAndrowLayout extends ReactViewGroup {
         hasColor = color != null;
         if (hasColor && mColor != color) {
             paint.setColor(color);
-            paint.setAlpha(Math.round(255 * mOpacity));
             mColor = color;
         }
         super.invalidate();
@@ -93,7 +91,6 @@ public class RNAndrowLayout extends ReactViewGroup {
             blur.setMaskFilter(new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL));
             shadowDirty = true;
             mRadius = radius*2;
-
         }
         super.invalidate();
     }
@@ -111,6 +108,7 @@ public class RNAndrowLayout extends ReactViewGroup {
         contentDirty = true;
         shadowDirty = true;
         super.onDescendantInvalidated(child, target);
+        super.invalidate(); //Gives better effect on touchableopacity etc.
     }
 
     @Override
@@ -127,6 +125,7 @@ public class RNAndrowLayout extends ReactViewGroup {
         int width = MeasureSpec.getSize(widthSpec);
         setMeasuredDimension(width, height);
         hasArea = width > 0 && height > 0;
+
         if (hasArea) {
             if (content.getWidth() == width && content.getHeight() == height) {
                 return;
@@ -134,6 +133,7 @@ public class RNAndrowLayout extends ReactViewGroup {
             content.recycle();
             hasContent = false;
             content = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
             draw.setBitmap(content);
         }
         invalidate();
@@ -141,6 +141,8 @@ public class RNAndrowLayout extends ReactViewGroup {
 
     @Override
     public void dispatchDraw(Canvas canvas) {
+        // TODO: Add on Load listerners to all child images, then run re render...
+
         if (hasArea) {
             if (contentDirty) {
                 if (hasContent) {
@@ -159,15 +161,15 @@ public class RNAndrowLayout extends ReactViewGroup {
                     shadowDirty = false;
                 }
 
-                x = dX - (mRadius*0.85f);
-                y = dY - (mRadius*0.85f);
+                x = dX - (mRadius*0.8f);
+                y = dY - (mRadius*0.8f);
 
                 canvas.drawBitmap(shadow, x, y, paint);
             }
-
             canvas.drawBitmap(content, 0f, 0f, null);
         } else {
             super.dispatchDraw(canvas);
         }
+
     }
 }
