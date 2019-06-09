@@ -141,8 +141,6 @@ public class RNAndrowLayout extends ReactViewGroup {
 
     @Override
     public void dispatchDraw(Canvas canvas) {
-        // TODO: Add on Load listerners to all child images, then run re render...
-
         if (hasArea) {
             if (contentDirty) {
                 if (hasContent) {

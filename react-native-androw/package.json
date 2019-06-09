@@ -1,7 +1,7 @@
 {
     "name": "react-native-androw",
     "description": "Solve shadows in React Native for Android",
-    "version": "0.0.24",
+    "version": "0.0.25",
     "author": "Olof Larsson <olof@folof.se> (http://www.folof.se)",
     "homepage": "https://github.com/folofse/androw",
     "keywords": [
