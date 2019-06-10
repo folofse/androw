@@ -8,6 +8,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewParent;
 
@@ -67,6 +69,7 @@ public class RNAndrowLayout extends ReactViewGroup {
         hasColor = color != null;
         if (hasColor && mColor != color) {
             paint.setColor(color);
+            paint.setAlpha(Math.round(255 * mOpacity));
             mColor = color;
         }
         super.invalidate();
@@ -77,6 +80,7 @@ public class RNAndrowLayout extends ReactViewGroup {
         float opacity = hasOpacity ? (float) Opacity.asDouble() : 0f;
         hasOpacity &= opacity > 0f;
         if (hasOpacity && mOpacity != opacity) {
+            paint.setColor(mColor);
             paint.setAlpha(Math.round(255 * opacity));
             mOpacity = opacity;
         }
@@ -159,8 +163,8 @@ public class RNAndrowLayout extends ReactViewGroup {
                     shadowDirty = false;
                 }
 
-                x = dX - (mRadius*0.8f);
-                y = dY - (mRadius*0.8f);
+                x = dX-((shadow.getWidth()-content.getWidth())/2);
+                y = dY-((shadow.getHeight()-content.getHeight())/2);
 
                 canvas.drawBitmap(shadow, x, y, paint);
             }
