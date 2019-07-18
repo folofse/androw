@@ -13,12 +13,12 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 public class RNAndrowManager extends ViewGroupManager<RNAndrowLayout> {
 
     public static final String REACT_CLASS = "RNAndrow";
-    public RNAndrowImageListener imageListener;
+
 
     @Override
     protected RNAndrowLayout createViewInstance(ThemedReactContext reactContext) {
         final RNAndrowLayout androwLayout = new RNAndrowLayout(reactContext);
-        this.imageListener = new RNAndrowImageListener(reactContext, androwLayout);
+        androwLayout.imageListener = new RNAndrowImageListener(reactContext, androwLayout); //One listener per Androw view.
         return androwLayout;
     }
 
@@ -49,7 +49,7 @@ public class RNAndrowManager extends ViewGroupManager<RNAndrowLayout> {
 
     @Override
     public void addView(RNAndrowLayout parent, View child, int index) {
-        this.imageListener.setImageOnLoadListerners(child);
+        parent.imageListener.setImageOnLoadListerners(child);
         super.addView(parent, child, index);
     }
 

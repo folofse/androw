@@ -19,6 +19,8 @@ import android.support.annotation.NonNull;
 
 public class RNAndrowLayout extends ReactViewGroup {
 
+    public RNAndrowImageListener imageListener;
+
     private int mColor;
     private float mRadius;
     private float mOpacity;
