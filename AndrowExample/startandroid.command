@@ -2,5 +2,5 @@
 ROOT_DIR=$(cd "$(dirname "$0")"; pwd)"/" 
 
 cd $ROOT_DIR
-react-native run-android
+react-native run-android log-android
 exit

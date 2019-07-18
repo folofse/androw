@@ -8,5 +8,4 @@ class ShadowView extends React.PureComponent {
 		return <AndrowView {...this.props} />;
 	}
 }
-
 export default ShadowView;
