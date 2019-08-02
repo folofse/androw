@@ -14,7 +14,6 @@ public class RNAndrowManager extends ViewGroupManager<RNAndrowLayout> {
 
     public static final String REACT_CLASS = "RNAndrow";
 
-
     @Override
     protected RNAndrowLayout createViewInstance(ThemedReactContext reactContext) {
         final RNAndrowLayout androwLayout = new RNAndrowLayout(reactContext);

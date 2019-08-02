@@ -10,9 +10,15 @@ This version is still under development and in beta.
 The problem is that a shadows does not work with React Native in Android. This view takes its children's, 
 creates a bitmap representation, blur it and color it to styles shadow values like in iOS
 
+## Whats new
+Verison 0.0.31
+* Added support for React Native 0.60.x and Android X
+
+Verison 0.0.30
+* Fixed shadow render problem with multiple Androw views and multiple image elements.
+
 ## Limitations
 
-* Not tested with lists and animations
 * Android has a bitmap limitation of 2048x2048, but this might depend on API version.
 * This plugin uses Software layer and might experience performance issues.
 
