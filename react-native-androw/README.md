@@ -11,6 +11,12 @@ The problem is that a shadows does not work with React Native in Android. This v
 creates a bitmap representation, blur it and color it to styles shadow values like in iOS
 
 ## Whats new
+Verison 0.0.33
+* Fixed pixel density on Android devices to better match iOS devices shadows.
+
+Verison 0.0.32
+* Fixed crash bug with multiple androw views, increased the performace when fading in multiple images at the same time.
+
 Verison 0.0.31
 * Added support for React Native 0.60.x and Android X
 
