@@ -1,7 +1,6 @@
 package se.folof.androw;
 
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -15,32 +14,35 @@ import com.facebook.react.views.image.ReactImageView;
 import com.facebook.react.views.view.ReactViewGroup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 
 public class RNAndrowImageListener implements EventDispatcherListener {
 
-    private List<Integer> imageIds = new ArrayList<Integer>();
-    private RNAndrowLayout androwLayout;
+    private Map<Integer,RNAndrowLayout> imageIds =  new HashMap<Integer,RNAndrowLayout>();
+    private List<RNAndrowLayout> viewsToFadeIn = new ArrayList<RNAndrowLayout>();
+    private ReactContext reactContext;
+    private EventDispatcher eventDispatcher;
 
     private CountDownTimer fadeTimer;
 
-    public RNAndrowImageListener(ReactContext reactContext, RNAndrowLayout androwLayout) {
-        this.androwLayout = androwLayout;
+    public RNAndrowImageListener(ReactContext reactContext) {
+        this.reactContext = reactContext;
 
-        final EventDispatcher mEventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-        mEventDispatcher.addListener(this);
+        this.eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+        this.eventDispatcher.addListener(this);
     }
 
-    public void setImageOnLoadListerners(View child){
+    public void onAddView(RNAndrowLayout parent, View child){
         if(child instanceof ReactImageView){
             ((ReactImageView)child).setShouldNotifyLoadEvents(true);
-            this.imageIds.add(child.getId());
+            this.imageIds.put(child.getId(), parent);
         }else if(child instanceof ReactViewGroup){
             for(int index = 0; index<((ViewGroup)child).getChildCount(); ++index) {
                 View nextChild = ((ViewGroup)child).getChildAt(index);
-                this.setImageOnLoadListerners(nextChild);
+                this.onAddView(parent, nextChild);
             }
         }
     }
@@ -49,6 +51,7 @@ public class RNAndrowImageListener implements EventDispatcherListener {
     public void onEventDispatch(final Event event) {
         // Events can be dispatched from any thread so we have to make sure handleEvent is run from the
         // UI thread.
+
         if (UiThreadUtil.isOnUiThread()) {
             handleEvent(event);
         } else {
@@ -63,18 +66,35 @@ public class RNAndrowImageListener implements EventDispatcherListener {
 
     private void handleEvent(Event event) {
         //Make sure it only redraws on image events in current androw view
-        if(event.getEventName() == "topLoadEnd" && this.imageIds.contains(event.getViewTag())){
-            this.fadeTimer = new CountDownTimer(300, 33) {
+        if(event.getEventName() == "topLoadEnd" && this.imageIds.containsKey(event.getViewTag())){
+
+            RNAndrowLayout androwLayout = this.imageIds.get(event.getViewTag());
+            this.viewsToFadeIn.add(androwLayout);
+
+            if(this.fadeTimer != null){
+                this.fadeTimer.cancel();
+            }
+
+            this.fadeTimer = new CountDownTimer(500, 33) {
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    androwLayout.invalidate();
+                    for (RNAndrowLayout view : viewsToFadeIn) {
+                        view.invalidate();
+                    }
                 }
 
                 @Override
                 public void onFinish() {
-
+                    for (RNAndrowLayout view : viewsToFadeIn) {
+                        view.invalidate();
+                    }
+                    viewsToFadeIn.clear();
                 }
             }.start();
         }
+    }
+
+    public void tearDown(){
+        this.eventDispatcher.removeListener(this);
     }
 }

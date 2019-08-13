@@ -1,6 +1,7 @@
 package se.folof.androw;
 
 
+import android.content.Context;
 import android.view.View;
 
 import com.facebook.react.bridge.Dynamic;
@@ -13,11 +14,16 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 public class RNAndrowManager extends ViewGroupManager<RNAndrowLayout> {
 
     public static final String REACT_CLASS = "RNAndrow";
+    public RNAndrowImageListener imageListener;
+
 
     @Override
     protected RNAndrowLayout createViewInstance(ThemedReactContext reactContext) {
         final RNAndrowLayout androwLayout = new RNAndrowLayout(reactContext);
-        androwLayout.imageListener = new RNAndrowImageListener(reactContext, androwLayout); //One listener per Androw view.
+        if(this.imageListener == null){//One listener for all androw views
+            this.imageListener = new RNAndrowImageListener(reactContext);
+        }
+
         return androwLayout;
     }
 
@@ -48,9 +54,13 @@ public class RNAndrowManager extends ViewGroupManager<RNAndrowLayout> {
 
     @Override
     public void addView(RNAndrowLayout parent, View child, int index) {
-        parent.imageListener.setImageOnLoadListerners(child);
+        this.imageListener.onAddView(parent, child);
         super.addView(parent, child, index);
     }
 
+    @Override
+    public void onDropViewInstance(RNAndrowLayout parent) {
+        this.imageListener.tearDown();
 
+    }
 }

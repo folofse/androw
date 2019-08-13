@@ -17,7 +17,6 @@ import com.facebook.react.views.view.ReactViewGroup;
 
 import androidx.annotation.NonNull;
 
-
 public class RNAndrowLayout extends ReactViewGroup {
 
     public RNAndrowImageListener imageListener;
@@ -63,6 +62,9 @@ public class RNAndrowLayout extends ReactViewGroup {
             dY = 0f;
         }
 
+        dX = dX*this.getContext().getResources().getDisplayMetrics().density;
+        dY = dY*this.getContext().getResources().getDisplayMetrics().density;
+
         super.invalidate();
     }
 
@@ -90,12 +92,15 @@ public class RNAndrowLayout extends ReactViewGroup {
 
     public void setShadowRadius(Dynamic Radius) {
         hasRadius = Radius != null && !Radius.isNull();
-        float radius = hasRadius ? (float) Radius.asDouble() : 0f;
+        float rawRadius = hasRadius ? (float) Radius.asDouble() : 0f;
+        float radius = (rawRadius*2)*this.getContext().getResources().getDisplayMetrics().density;
         hasRadius &= radius > 0f;
-        if (hasRadius && mRadius != radius) {
+
+        if (hasRadius && mRadius != radius ) {
             blur.setMaskFilter(new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL));
+            mRadius = radius;
             shadowDirty = true;
-            mRadius = radius*2;
+
         }
         super.invalidate();
     }
