@@ -175,9 +175,9 @@ public class RNAndrowLayout extends ReactViewGroup {
                 canvas.drawBitmap(shadow, x, y, paint);
             }
             canvas.drawBitmap(content, 0f, 0f, null);
-        } else {
-            super.dispatchDraw(canvas);
         }
-
+        
+        super.dispatchDraw(canvas);
+      
     }
 }
